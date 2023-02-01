@@ -1,6 +1,6 @@
 <?php
 
-namespace Ashraf\LaravelInstaller\Traits;
+namespace Leafwrap\LaravelInstaller\Traits;
 
 use Exception;
 use Illuminate\Support\Facades\Artisan;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Ashraf\LaravelInstaller\Http\Middleware;
+namespace Leafwrap\LaravelInstaller\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;

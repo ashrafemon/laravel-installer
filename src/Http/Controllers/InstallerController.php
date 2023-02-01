@@ -1,6 +1,6 @@
 <?php
 
-namespace Ashraf\LaravelInstaller\Http\Controllers;
+namespace Leafwrap\LaravelInstaller\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Ashraf\LaravelInstaller\Traits\Helper;

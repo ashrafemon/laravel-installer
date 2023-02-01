@@ -1,5 +1,5 @@
 {
-    "name": "ashraf/laravel-installer",
+    "name": "leafwrap/laravel-installer",
     "description": "Installation for deploying or running laravel project by server requirements",
     "type": "library",
     "license": "MIT",
@@ -19,7 +19,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Ashraf\\LaravelInstaller\\LaravelInstallerServiceProvider"
+                "Leafwrap\\LaravelInstaller\\LaravelInstallerServiceProvider"
             ]
         }
     }

@@ -1,10 +1,10 @@
 <?php
 
-namespace Ashraf\LaravelInstaller;
+namespace Leafwrap\LaravelInstaller;
 
-use Ashraf\LaravelInstaller\Http\Middleware\InstallChecker;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
+use Leafwrap\LaravelInstaller\Http\Middleware\InstallChecker;
 
 class LaravelInstallerServiceProvider extends ServiceProvider
 {
@@ -13,10 +13,9 @@ class LaravelInstallerServiceProvider extends ServiceProvider
         $this->loadRoutesFrom(__DIR__ . '/routes/web.php');
         $this->loadViewsFrom(__DIR__ . '/views', 'laravel-installer');
         $this->mergeConfigFrom(__DIR__ . '/config/laravel-installer.php', 'laravel-installer');
-        $this->publishes([
-            __DIR__ . '/config/laravel-installer.php' => config_path('laravel-installer.php'),
-        ]);
-
+        // $this->publishes([
+        //     __DIR__ . '/config/laravel-installer.php' => config_path('laravel-installer.php'),
+        // ]);
         $kernel->pushMiddleware(InstallChecker::class);
     }
 
