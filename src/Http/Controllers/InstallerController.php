@@ -3,7 +3,7 @@
 namespace Leafwrap\LaravelInstaller\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Ashraf\LaravelInstaller\Traits\Helper;
+use Leafwrap\LaravelInstaller\Traits\Helper;
 
 class InstallerController extends Controller
 {
