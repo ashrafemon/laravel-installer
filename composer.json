@@ -1,0 +1,26 @@
+{
+    "name": "ashraf/laravel-installer",
+    "description": "Installation for deploying or running laravel project by server requirements",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Ashraf\\LaravelInstaller\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ashraf Emon",
+            "email": "ashraf.emon143@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Ashraf\\LaravelInstaller\\LaravelInstallerServiceProvider"
+            ]
+        }
+    }
+}
