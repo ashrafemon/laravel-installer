@@ -1,26 +1,27 @@
 {
-    "name": "leafwrap/laravel-installer",
-    "description": "Installation for deploying or running laravel project by server requirements",
-    "type": "library",
-    "license": "MIT",
-    "autoload": {
-        "psr-4": {
-            "Leafwrap\\LaravelInstaller\\": "src/"
-        }
-    },
-    "authors": [
-        {
-            "name": "Ashraf Emon",
-            "email": "ashraf.emon143@gmail.com"
-        }
-    ],
-    "minimum-stability": "dev",
-    "require": {},
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Leafwrap\\LaravelInstaller\\LaravelInstallerServiceProvider"
-            ]
-        }
+  "name": "leafwrap/laravel-installer",
+  "description": "Installation for deploying or running laravel project by server requirements",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Leafwrap\\LaravelInstaller\\": "src/"
     }
+  },
+  "authors": [
+    {
+      "name": "Ashraf Emon",
+      "email": "ashraf.emon143@gmail.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {},
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Leafwrap\\LaravelInstaller\\LaravelInstallerServiceProvider"
+      ]
+    }
+  }
 }
