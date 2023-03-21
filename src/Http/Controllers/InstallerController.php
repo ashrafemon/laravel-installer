@@ -43,7 +43,8 @@ class InstallerController extends Controller
 
     public function licenseView()
     {
-        return view('laravel-installer::pages.license');
+        $products = config('laravel-installer.products');
+        return view('laravel-installer::pages.license', compact('products'));
     }
 
     public function licenseStore()

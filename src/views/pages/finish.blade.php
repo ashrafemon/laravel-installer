@@ -12,11 +12,11 @@
         </div>
 
         <h5 class="mb-4">Getting Started Guide -
-            <small><a href="{{ env('APP_URL') }}/login">Read More</a></small>
+            <small><a href="{{ config('laravel-installer.guideline_url') }}">Read More</a></small>
         </h5>
 
         <h5 class="mb-4">Looking for Help? -
-            <small><a href="{{ env('APP_URL') }}/login">Open Support Ticket</a></small>
+            <small><a href="{{ config('laravel-installer.support_url') }}">Open Support Ticket</a></small>
         </h5>
 
         <div class="text-center mt-5">

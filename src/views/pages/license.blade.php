@@ -6,14 +6,17 @@
             @csrf
             <div class="my-3">
                 <label class="form-label">Select Product</label>
-                <select class="form-select" aria-label="Default select example">
+                <select class="form-select" name="product_id" value={{ old('product_id') }}>
                     <option selected>Select Product</option>
-                    <option value="1">One</option>
+                    @foreach ($products as $product)
+                        <option {{ $product['value'] === config('laravel-installer.product_id') ? 'selected' : '' }}
+                            value="{{ $product['value'] }}">One</option>
+                    @endforeach
                 </select>
             </div>
             <div>
                 <label class="form-label">Licence Code</label>
-                <input type="text" class="form-control">
+                <input type="text" class="form-control" name="license" value="{{ old('license') }}">
             </div>
 
             <div class="text-center mt-5">
