@@ -94,7 +94,8 @@ class InstallerController extends Controller
 
     public function installStore()
     {
-        $user = User::create([
+        $model = config('auth.providers.users.model');
+        $model::create([
             'role_id'    => 1,
             'first_name' => request()->input('first_name'),
             'last_name'  => request()->input('last_name'),
@@ -117,5 +118,4 @@ class InstallerController extends Controller
     {
         return view('laravel-installer::pages.finish');
     }
-
 }
