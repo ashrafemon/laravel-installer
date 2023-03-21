@@ -107,7 +107,7 @@ trait Helper
                 $oldLine           = substr($str, $keyPosition, $endOfLinePosition - $keyPosition);
 
                 if (!$keyPosition || !$endOfLinePosition || !$oldLine) {
-                    $str .= "{$envKey}='{$envValue}'\n";
+                    $str .= "{$envKey}=" . '"' . $envValue . '"' . "'\n";
                 } else {
                     $str = str_replace($oldLine, "{$envKey}='{$envValue}'", $str);
                 }
