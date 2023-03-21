@@ -94,14 +94,14 @@ class InstallerController extends Controller
 
     public function installStore()
     {
-        // $user = User::create([
-        //     'first_name'   => request()->input('first_name'),
-        //     'last_name'    => request()->input('last_name'),
-        //     'phone'        => request()->input('phone'),
-        //     'email'        => request()->input('email'),
-        //     'password'     => request()->input('password'),
-        //     'otp_verified' => 1,
-        // ]);
+        $user = User::create([
+            'role_id'    => 1,
+            'first_name' => request()->input('first_name'),
+            'last_name'  => request()->input('last_name'),
+            'phone'      => request()->input('phone'),
+            'email'      => request()->input('email'),
+            'password'   => request()->input('password'),
+        ]);
 
         $content = <<<TEXT
         <?php
