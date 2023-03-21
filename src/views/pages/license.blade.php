@@ -10,7 +10,7 @@
                     <option selected>Select Product</option>
                     @foreach ($products as $product)
                         <option {{ $product['value'] === config('laravel-installer.product_id') ? 'selected' : '' }}
-                            value="{{ $product['value'] }}">One</option>
+                            value="{{ $product['value'] }}">{{ $product['name'] }}</option>
                     @endforeach
                 </select>
             </div>
