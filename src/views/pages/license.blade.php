@@ -7,7 +7,7 @@
             <div class="my-3">
                 <label class="form-label">Select Product</label>
                 <select class="form-select" name="product_id" value={{ old('product_id') }}>
-                    <option selected>Select Product</option>
+                    <option disabled>Select Product</option>
                     @foreach ($products as $product)
                         <option {{ $product['value'] === config('laravel-installer.product_id') ? 'selected' : '' }}
                             value="{{ $product['value'] }}">{{ $product['name'] }}</option>
