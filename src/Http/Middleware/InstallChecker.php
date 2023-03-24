@@ -16,8 +16,10 @@ class InstallChecker
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!file_exists(config_path() . '/installed.php') && !str_contains(request()->url(), 'installer')) {
-            return redirect()->route('requirements.index');
+        if (!file_exists(config_path() . '/installed.php')) {
+            if (!str_contains(request()->url(), 'installer') && request()->header('Accept') !== 'application/json') {
+                return redirect()->route('requirements.index');
+            }
         }
         return $next($request);
     }

@@ -3,120 +3,174 @@
 namespace Leafwrap\LaravelInstaller\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Exception;
 use Leafwrap\LaravelInstaller\Traits\Helper;
 
 class InstallerController extends Controller
 {
     use Helper;
 
-    public function requirementsView()
+    public function getExtensions()
     {
-        $extensions = $this->getExtensions();
-        return view('laravel-installer::pages.requirements', compact('extensions'));
+        try {
+            return $this->entityResponse($this->getRequireExtensions());
+        } catch (Exception $e) {
+            return $this->serverError($e);
+        }
     }
 
-    public function requirementsStore()
+    public function validateExtensions()
     {
-        foreach ($this->getExtensions() as $extension) {
-            if (!$extension) {
-                return redirect()->back()->with(['message' => 'Please enabled the required extension']);
+        try {
+            foreach ($this->getRequireExtensions() as $item) {
+                if (!$item) {
+                    return $this->messageResponse('Please enabled the required extensions', 400);
+                }
             }
+            return $this->messageResponse('Requirement step is completed', 200, 'success');
+        } catch (Exception $e) {
+            return $this->serverError($e);
         }
-        return redirect()->route('permissions.index');
     }
 
-    public function permissionsView()
+    public function getPermissions()
     {
-        $permissions = $this->getPermissions();
-        return view('laravel-installer::pages.permissions', compact('permissions'));
+        try {
+            return $this->entityResponse($this->getRequirePermissions());
+        } catch (Exception $e) {
+            return $this->serverError($e);
+        }
     }
 
-    public function permissionsStore()
+    public function validatePermissions()
     {
-        foreach ($this->getPermissions() as $permission) {
-            if (!$permission) {
-                return redirect()->back()->with(['message' => 'Please enabled the permission of the folders']);
+        try {
+            foreach ($this->getRequirePermissions() as $item) {
+                if (!$item) {
+                    return $this->messageResponse('Please enabled the required permissions', 400);
+                }
             }
+            return $this->messageResponse('Permissions step is completed', 200, 'success');
+        } catch (Exception $e) {
+            return $this->serverError($e);
         }
-        return redirect()->route('license.index');
     }
 
-    public function licenseView()
+    public function getProducts()
     {
-        $products = config('laravel-installer.products');
-        return view('laravel-installer::pages.license', compact('products'));
-    }
+        try {
+            $client = \Illuminate\Support\Facades\Http::withHeaders([
+                'Accept' => 'application/json', 'Content-Type' => 'application/json',
+            ])->get(config('laravel-installer.products_url') . '?page=1&offset=20');
+            $client = $client->json();
 
-    public function licenseStore()
-    {
-        return redirect()->route('database.index');
-    }
-
-    public function databaseView()
-    {
-        $database = $this->getAppInfo('database');
-        return view('laravel-installer::pages.database', compact('database'));
-    }
-
-    public function databaseStore()
-    {
-        $checkDB = $this->getDatabaseConnection();
-        if (!$checkDB) {
-            return redirect()->back()->with(['message' => 'Please use the correct database credentials']);
+            if ($client['status'] === 'success') {
+                $products = $client['data'];
+            }
+            return $this->entityResponse([
+                'products'            => $products ?? [],
+                'selected_product_id' => config('laravel-installer.product_id'),
+            ]);
+        } catch (Exception $e) {
+            return $this->serverError($e);
         }
-        return redirect()->route('mail.index');
     }
 
-    public function mailView()
+    public function validateLicenses()
     {
-        $mailInfo    = $this->getAppInfo('mail');
-        $mailers     = ['smtp', 'ses', 'mailgun', 'postmark', 'sendmail'];
-        $encryptions = ['tls', 'ssl'];
-        return view('laravel-installer::pages.mail', compact('mailInfo', 'mailers', 'encryptions'));
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make(request()->all(), [
+                'product_id' => 'required',
+                'code'       => 'required|regex:/^([a-f0-9]{8})-(([a-f0-9]{4})-){3}([a-f0-9]{12})$/i',
+            ]);
+            if ($validator->fails()) {
+                return $this->validateError($validator->errors());
+            }
+
+            $client = \Illuminate\Support\Facades\Http::withHeaders([
+                'Accept' => 'application/json', 'Content-Type' => 'application/json',
+            ])->post(config('laravel-installer.license_url'), [
+                'product_id' => request()->input('product_id'),
+                'code'       => request()->input('code'),
+            ]);
+            $client = $client->json();
+            return $client;
+        } catch (Exception $e) {
+            return $this->serverError($e);
+        }
     }
 
-    public function mailStore()
+    public function getDatabases()
     {
-        $this->setEnvironmentProperty([
-            'MAIL_MAILER'     => request()->input('MAIL_MAILER'),
-            'MAIL_HOST'       => request()->input('MAIL_HOST'),
-            'MAIL_PORT'       => request()->input('MAIL_PORT'),
-            'MAIL_ENCRYPTION' => request()->input('MAIL_ENCRYPTION'),
-            'MAIL_USERNAME'   => request()->input('MAIL_USERNAME'),
-            'MAIL_PASSWORD'   => request()->input('MAIL_PASSWORD'),
-        ]);
-        return redirect()->route('install.index');
+        try {
+            return $this->entityResponse($this->getAppInfo('database'));
+        } catch (Exception $e) {
+            return $this->serverError($e);
+        }
     }
 
-    public function installView()
+    public function validateDatabases()
     {
-        return view('laravel-installer::pages.install');
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make(request()->all(), [
+                'DB_HOST'     => 'required',
+                'DB_PORT'     => 'required',
+                'DB_DATABASE' => 'required',
+                'DB_USERNAME' => 'required',
+                'DB_PASSWORD' => 'sometimes',
+            ]);
+            if ($validator->fails()) {
+                return $this->validateError($validator->errors());
+            }
+
+            if (!$this->getDatabaseConnection()) {
+                return $this->messageResponse('Please use the correct database credentials', 400);
+            }
+
+            return $this->messageResponse('Database step is completed', 200, 'success');
+        } catch (Exception $e) {
+            return $this->serverError($e);
+        }
     }
 
-    public function installStore()
+    public function validateInstallation()
     {
-        $model = config('auth.providers.users.model');
-        $model::create([
-            'role_id'    => 1,
-            'first_name' => request()->input('first_name'),
-            'last_name'  => request()->input('last_name'),
-            'phone'      => request()->input('phone'),
-            'email'      => request()->input('email'),
-            'password'   => request()->input('password'),
-        ]);
+        try {
+            $validator = \Illuminate\Support\Facades\Validator::make(request()->all(), [
+                'role_id'    => 'sometimes',
+                'first_name' => 'required',
+                'last_name'  => 'sometimes',
+                'phone'      => 'sometimes',
+                'email'      => 'required',
+                'password'   => 'required',
 
-        $content = <<<TEXT
-        <?php
-            return [
-                'installation' => 'Complete',
-            ];
-        TEXT;
-        file_put_contents(config_path() . '/installed.php', $content);
-        return redirect()->route('finish.index');
-    }
+            ]);
+            if ($validator->fails()) {
+                return $this->validateError($validator->errors());
+            }
 
-    public function finishView()
-    {
-        return view('laravel-installer::pages.finish');
+            $model = config('auth.providers.users.model');
+            $model::create([
+                'role_id'    => 1,
+                'first_name' => request()->input('first_name'),
+                'last_name'  => request()->input('last_name'),
+                'phone'      => request()->input('phone'),
+                'email'      => request()->input('email'),
+                'password'   => request()->input('password'),
+            ]);
+
+            $content = <<<TEXT
+            <?php
+                return [
+                    'installation' => 'Complete',
+                ];
+            TEXT;
+            file_put_contents(config_path() . '/installed.php', $content);
+            file_put_contents(storage_path() . '/installed', 'Installed');
+
+            return $this->messageResponse('Installation step is completed', 200, 'success');
+        } catch (Exception $e) {
+            return $this->serverError($e);
+        }
     }
 }

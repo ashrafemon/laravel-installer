@@ -13,6 +13,8 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
     <style>
         a,
@@ -24,7 +26,7 @@
 
         .logo {
             width: 130px;
-            height: 50px;
+            height: auto;
         }
 
         body {
@@ -94,27 +96,34 @@
 <body>
     <div class="container">
         <div class="text-center mt-5 mb-3">
-            <img src="https://cdn.pixabay.com/photo/2016/12/27/13/10/logo-1933884__340.png" class="logo"
-                alt="Logo">
+            <img src="{{ config('laravel-installer.company_logo') }}" class="logo" alt="Logo">
         </div>
 
-        <div class="card shadow border-0">
+        <div class="card shadow border-0 mb-5">
             <div class="card-body">
 
                 <ul id="progress" class="mb-5">
-                    <li class="active">Requirements</li>
-                    <li>Permissions</li>
-                    <li>License</li>
-                    <li>Database</li>
-                    <li>Mail</li>
-                    <li>Install</li>
-                    <li>Finish</li>
+                    <li class="{{ Route::current()->getName() === 'requirements.index' ? 'active' : '' }}">
+                        Requirements
+                    </li>
+                    <li class="{{ Route::current()->getName() === 'permissions.index' ? 'active' : '' }}">
+                        Permissions
+                    </li>
+                    <li class="{{ Route::current()->getName() === 'license.index' ? 'active' : '' }}">License</li>
+                    <li class="{{ Route::current()->getName() === 'database.index' ? 'active' : '' }}">Database</li>
+                    {{-- <li class="{{ Route::current()->getName() === 'requirements.index' ? 'active' : '' }}">Mail</li> --}}
+                    <li class="{{ Route::current()->getName() === 'install.index' ? 'active' : '' }}">Install</li>
+                    <li class="{{ Route::current()->getName() === 'finish.index' ? 'active' : '' }}">Finish</li>
                 </ul>
 
                 @yield('content')
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.3/dist/sweetalert2.all.min.js"></script>
+
+    @stack('custom-js')
 </body>
 
 </html>

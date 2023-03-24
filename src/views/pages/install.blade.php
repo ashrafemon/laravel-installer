@@ -1,78 +1,142 @@
 @extends('laravel-installer::layouts.installer')
 
 @section('content')
-    <div id="install">
-        <form action="{{ route('install.store') }}" method="POST">
-            @csrf
+    <div id="install" x-data="installs">
+        <form @submit.prevent="submitHandler" method="POST">
             <div class="row gy-3 justify-content-center">
                 <div class="col-lg-6 col-sm-12">
                     <h6 class="fs-5 fw-bold py-2">Admin Login</h6>
                     <div class="row row-cols-1 gx-3 gy-4">
                         <div class="col">
                             <label class="form-label">First Name</label>
-                            <input type="text" class="form-control" name="first_name" value="{{ old('first_name') }}">
+                            <input type="text" class="form-control" x-model="form.first_name"
+                                @keyup="errors.first_name.show = false">
+
+                            <template x-if="errors.first_name.show">
+                                <p x-text="errors.first_name.text" class="text-danger"></p>
+                            </template>
                         </div>
                         <div class="col">
                             <label class="form-label">Last Name</label>
-                            <input type="text" class="form-control" name="last_name" value="{{ old('last_name') }}">
+                            <input type="text" class="form-control" x-model="form.last_name"
+                                @keyup="errors.last_name.show = false">
+
+                            <template x-if="errors.last_name.show">
+                                <p x-text="errors.last_name.text" class="text-danger"></p>
+                            </template>
                         </div>
                         <div class="col">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control" name="email" value="{{ old('email') }}">
+                            <input type="email" class="form-control" x-model="form.email"
+                                @keyup="errors.email.show = false">
+
+                            <template x-if="errors.email.show">
+                                <p x-text="errors.email.text" class="text-danger"></p>
+                            </template>
                         </div>
                         <div class="col">
                             <label class="form-label">Password</label>
-                            <input type="text" class="form-control" name="password" value="{{ old('password') }}">
+                            <input type="text" class="form-control" x-model="form.password"
+                                @keyup="errors.password.show = false">
+
+                            <template x-if="errors.password.show">
+                                <p x-text="errors.password.text" class="text-danger"></p>
+                            </template>
                         </div>
                         <div class="col">
                             <label class="form-label">Confirm Password</label>
-                            <input type="text" class="form-control" name="password_confirmation"
-                                value="{{ old('password_confirmation') }}">
+                            <input type="text" class="form-control" x-model="form.password_confirmation"
+                                @keyup="errors.password_confirmation.show = false">
+
+                            <template x-if="errors.password_confirmation.show">
+                                <p x-text="errors.password_confirmation.text" class="text-danger"></p>
+                            </template>
                         </div>
                     </div>
                 </div>
-
-                {{-- <div class="col-lg-6 col-sm-12">
-                    <h6 class="fs-5 fw-bold py-2">Demo Login</h6>
-                    <div class="row row-cols-1 gx-3 gy-4">
-                        <div class="col">
-                            <label class="form-label">First Name</label>
-                            <input type="text" class="form-control">
-                        </div>
-                        <div class="col">
-                            <label class="form-label">Last Name</label>
-                            <input type="text" class="form-control">
-                        </div>
-                        <div class="col">
-                            <label class="form-label">Email</label>
-                            <input type="text" class="form-control">
-                        </div>
-                        <div class="col">
-                            <label class="form-label">Password</label>
-                            <input type="text" class="form-control">
-                        </div>
-                        <div class="col">
-                            <label class="form-label">Confirm Password</label>
-                            <input type="text" class="form-control">
-                        </div>
-                    </div>
-                </div> --}}
-
-                {{-- <div class="col-lg-6 col-sm-12">
-                    <h6 class="fs-5 fw-bold py-2">Default Timezone</h6>
-                    <div>
-                        <label class="form-label">Timezone</label>
-                        <select class="form-select">
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
-                </div> --}}
             </div>
 
             <div class="text-center mt-5">
-                <button type="submit" class="btn btn-outline-primary">Finish</button>
+                <button type="submit" class="btn btn-outline-primary" :disabled="loading"
+                    x-text="loading ? 'Loading...': 'Finish'">Finish</button>
             </div>
         </form>
     </div>
 @endsection
+
+@push('custom-js')
+    <script>
+        document.addEventListener("alpine:init", () => {
+            Alpine.data("installs", () => ({
+                form: {
+                    first_name: '',
+                    last_name: '',
+                    email: '',
+                    password: '',
+                },
+                errors: {
+                    first_name: {
+                        text: '',
+                        show: false
+                    },
+                    last_name: {
+                        text: '',
+                        show: false
+                    },
+                    email: {
+                        text: '',
+                        show: false
+                    },
+                    password: {
+                        text: '',
+                        show: false
+                    },
+                    password_confirmation: {
+                        text: '',
+                        show: false
+                    },
+                },
+                loading: false,
+                async submitHandler() {
+                    this.loading = true;
+                    await fetch('/api/v1/install/validate', {
+                            method: "POST",
+                            headers: {
+                                Accept: 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(this.form)
+                        })
+                        .then(res => res.json())
+                        .then(res => {
+                            if (res.status === 'validate_error') {
+                                Object.keys(res.data).forEach((key) => {
+                                    if (res.data[key]) {
+                                        this.errors[key] = {
+                                            text: res.data[key],
+                                            show: true
+                                        }
+                                    }
+                                })
+                            } else {
+                                Swal.fire({
+                                    title: res.message,
+                                    icon: res.status === 'success' ? 'success' :
+                                        'error',
+                                    timer: 2500
+                                })
+
+                                if (res.status === 'success') {
+                                    setTimeout(() => {
+                                        window.location.href = '/installer/finish'
+                                    }, 1000);
+                                }
+                            }
+                        })
+                        .catch(err => console.log(err))
+                    this.loading = false;
+                }
+            }))
+        })
+    </script>
+@endpush

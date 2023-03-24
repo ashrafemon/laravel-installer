@@ -8,9 +8,43 @@ use Illuminate\Support\Facades\DB;
 
 trait Helper
 {
-    private function getExtensions()
+    protected function serverError($exception)
+    {
+        return response(['status' => 'server_error', 'statusCode' => 500, 'message' => $exception->getMessage()], 500);
+    }
+
+    protected function validateError($data, $override = false)
+    {
+        $errors       = [];
+        $errorPayload = !$override ? $data->getMessages() : $data;
+
+        foreach ($errorPayload as $key => $value) {
+            $errors[$key] = $value[0];
+        }
+
+        return response(['status' => 'validate_error', 'statusCode' => 422, 'data' => $errors], 422);
+    }
+
+    protected function messageResponse($message = 'No data found', $statusCode = 404, $status = 'error')
+    {
+        return response(['status' => $status, 'statusCode' => $statusCode, 'message' => $message], $statusCode);
+    }
+
+    protected function entityResponse($data = null, $statusCode = 200, $status = 'success', $message = null)
+    {
+        $payload = ['status' => $status, 'statusCode' => $statusCode, 'data' => $data];
+
+        if ($message) {
+            $payload['message'] = $message;
+        }
+
+        return response($payload, $statusCode);
+    }
+
+    private function getRequireExtensions()
     {
         return [
+            'php'           => phpversion(),
             'phpVersion'    => phpversion() >= 8.0,
             'bcMath'        => extension_loaded('bcmath'),
             'cType'         => extension_loaded('ctype'),
@@ -25,10 +59,11 @@ trait Helper
             'gd'            => extension_loaded('gd'),
             'zip'           => extension_loaded('zip'),
             'allowUrlFOpen' => ini_get('allow_url_fopen'),
+            'curl'          => extension_loaded("curl"),
         ];
     }
 
-    private function getPermissions()
+    private function getRequirePermissions()
     {
         return [
             'files'  => is_writable(public_path() . '/uploads/files'),
@@ -44,17 +79,28 @@ trait Helper
             if (!in_array($driver, ['mysql', 'pgsql', 'sqlsrv'])) {
                 return false;
             }
+
+            config('database.connections', [
+                $driver => [
+                    'host'     => request()->input('DB_HOST'),
+                    'port'     => request()->input('DB_PORT'),
+                    'database' => request()->input('DB_DATABASE'),
+                    'username' => request()->input('DB_USERNAME'),
+                    'password' => request()->input('DB_PASSWORD'),
+                ],
+            ]);
+            if (!DB::connection()->getPDO()) {
+                return false;
+            }
+
             $this->setEnvironmentProperty([
-                'APP_URL'     => url(''),
+                // 'APP_URL'     => url(''),
                 'DB_HOST'     => request()->input('DB_HOST'),
                 'DB_PORT'     => request()->input('DB_PORT'),
                 'DB_DATABASE' => request()->input('DB_DATABASE'),
                 'DB_USERNAME' => request()->input('DB_USERNAME'),
                 'DB_PASSWORD' => request()->input('DB_PASSWORD'),
             ]);
-            if (!DB::connection()->getPDO()) {
-                return false;
-            }
 
             Artisan::call('migrate:fresh --seed');
             return true;
@@ -107,9 +153,9 @@ trait Helper
                 $oldLine           = substr($str, $keyPosition, $endOfLinePosition - $keyPosition);
 
                 if (!$keyPosition || !$endOfLinePosition || !$oldLine) {
-                    $str .= "{$envKey}=" . '"' . $envValue . '"' . "'\n";
+                    $str .= $envKey . "=" . $envValue . "'\n";
                 } else {
-                    $str = str_replace($oldLine, "{$envKey}='{$envValue}'", $str);
+                    $str = str_replace($oldLine, $envKey . "=" . $envValue, $str);
                 }
             }
         }
