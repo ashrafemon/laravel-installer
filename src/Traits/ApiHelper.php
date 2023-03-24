@@ -6,14 +6,14 @@ use Exception;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
-trait Helper
+trait ApiHelper
 {
-    protected function serverError($exception)
+    protected function installerServerError($exception)
     {
         return response(['status' => 'server_error', 'statusCode' => 500, 'message' => $exception->getMessage()], 500);
     }
 
-    protected function validateError($data, $override = false)
+    protected function installerValidateError($data, $override = false)
     {
         $errors       = [];
         $errorPayload = !$override ? $data->getMessages() : $data;
@@ -25,12 +25,12 @@ trait Helper
         return response(['status' => 'validate_error', 'statusCode' => 422, 'data' => $errors], 422);
     }
 
-    protected function messageResponse($message = 'No data found', $statusCode = 404, $status = 'error')
+    protected function installerMessageResponse($message = 'No data found', $statusCode = 404, $status = 'error')
     {
         return response(['status' => $status, 'statusCode' => $statusCode, 'message' => $message], $statusCode);
     }
 
-    protected function entityResponse($data = null, $statusCode = 200, $status = 'success', $message = null)
+    protected function installerEntityResponse($data = null, $statusCode = 200, $status = 'success', $message = null)
     {
         $payload = ['status' => $status, 'statusCode' => $statusCode, 'data' => $data];
 

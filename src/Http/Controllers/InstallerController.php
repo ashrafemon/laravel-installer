@@ -4,18 +4,18 @@ namespace Leafwrap\LaravelInstaller\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Exception;
-use Leafwrap\LaravelInstaller\Traits\Helper;
+use Leafwrap\LaravelInstaller\Traits\ApiHelper;
 
 class InstallerController extends Controller
 {
-    use Helper;
+    use ApiHelper;
 
     public function getExtensions()
     {
         try {
-            return $this->entityResponse($this->getRequireExtensions());
+            return $this->installerEntityResponse($this->getRequireExtensions());
         } catch (Exception $e) {
-            return $this->serverError($e);
+            return $this->installerServerError($e);
         }
     }
 
@@ -24,21 +24,21 @@ class InstallerController extends Controller
         try {
             foreach ($this->getRequireExtensions() as $item) {
                 if (!$item) {
-                    return $this->messageResponse('Please enabled the required extensions', 400);
+                    return $this->installerMessageResponse('Please enabled the required extensions', 400);
                 }
             }
-            return $this->messageResponse('Requirement step is completed', 200, 'success');
+            return $this->installerMessageResponse('Requirement step is completed', 200, 'success');
         } catch (Exception $e) {
-            return $this->serverError($e);
+            return $this->installerServerError($e);
         }
     }
 
     public function getPermissions()
     {
         try {
-            return $this->entityResponse($this->getRequirePermissions());
+            return $this->installerEntityResponse($this->getRequirePermissions());
         } catch (Exception $e) {
-            return $this->serverError($e);
+            return $this->installerServerError($e);
         }
     }
 
@@ -47,12 +47,12 @@ class InstallerController extends Controller
         try {
             foreach ($this->getRequirePermissions() as $item) {
                 if (!$item) {
-                    return $this->messageResponse('Please enabled the required permissions', 400);
+                    return $this->installerMessageResponse('Please enabled the required permissions', 400);
                 }
             }
-            return $this->messageResponse('Permissions step is completed', 200, 'success');
+            return $this->installerMessageResponse('Permissions step is completed', 200, 'success');
         } catch (Exception $e) {
-            return $this->serverError($e);
+            return $this->installerServerError($e);
         }
     }
 
@@ -67,12 +67,12 @@ class InstallerController extends Controller
             if ($client['status'] === 'success') {
                 $products = $client['data'];
             }
-            return $this->entityResponse([
+            return $this->installerEntityResponse([
                 'products'            => $products ?? [],
                 'selected_product_id' => config('laravel-installer.product_id'),
             ]);
         } catch (Exception $e) {
-            return $this->serverError($e);
+            return $this->installerServerError($e);
         }
     }
 
@@ -84,7 +84,7 @@ class InstallerController extends Controller
                 'code'       => 'required|regex:/^([a-f0-9]{8})-(([a-f0-9]{4})-){3}([a-f0-9]{12})$/i',
             ]);
             if ($validator->fails()) {
-                return $this->validateError($validator->errors());
+                return $this->installerValidateError($validator->errors());
             }
 
             $client = \Illuminate\Support\Facades\Http::withHeaders([
@@ -96,16 +96,16 @@ class InstallerController extends Controller
             $client = $client->json();
             return $client;
         } catch (Exception $e) {
-            return $this->serverError($e);
+            return $this->installerServerError($e);
         }
     }
 
     public function getDatabases()
     {
         try {
-            return $this->entityResponse($this->getAppInfo('database'));
+            return $this->installerEntityResponse($this->getAppInfo('database'));
         } catch (Exception $e) {
-            return $this->serverError($e);
+            return $this->installerServerError($e);
         }
     }
 
@@ -120,16 +120,16 @@ class InstallerController extends Controller
                 'DB_PASSWORD' => 'sometimes',
             ]);
             if ($validator->fails()) {
-                return $this->validateError($validator->errors());
+                return $this->installerValidateError($validator->errors());
             }
 
             if (!$this->getDatabaseConnection()) {
-                return $this->messageResponse('Please use the correct database credentials', 400);
+                return $this->installerMessageResponse('Please use the correct database credentials', 400);
             }
 
-            return $this->messageResponse('Database step is completed', 200, 'success');
+            return $this->installerMessageResponse('Database step is completed', 200, 'success');
         } catch (Exception $e) {
-            return $this->serverError($e);
+            return $this->installerServerError($e);
         }
     }
 
@@ -146,7 +146,7 @@ class InstallerController extends Controller
 
             ]);
             if ($validator->fails()) {
-                return $this->validateError($validator->errors());
+                return $this->installerValidateError($validator->errors());
             }
 
             $model = config('auth.providers.users.model');
@@ -168,9 +168,9 @@ class InstallerController extends Controller
             file_put_contents(config_path() . '/installed.php', $content);
             file_put_contents(storage_path() . '/installed', 'Installed');
 
-            return $this->messageResponse('Installation step is completed', 200, 'success');
+            return $this->installerMessageResponse('Installation step is completed', 200, 'success');
         } catch (Exception $e) {
-            return $this->serverError($e);
+            return $this->installerServerError($e);
         }
     }
 }
