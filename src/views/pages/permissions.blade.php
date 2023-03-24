@@ -88,9 +88,11 @@
                                 icon: res.status === 'success' ? 'success' : 'error',
                                 timer: 1500
                             })
-                            setTimeout(() => {
-                                window.location.href = '/installer/license'
-                            }, 1000);
+                            if (res.status === 'success') {
+                                setTimeout(() => {
+                                    window.location.href = '/installer/license'
+                                }, 1000);
+                            }
                         })
                         .catch(err => console.log(err))
                 }
