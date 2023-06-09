@@ -5,10 +5,10 @@
         <form @submit.prevent="submitHandler">
             <div class="my-3">
                 <label class="form-label">Select Product</label>
-                <select class="form-select" x-model="form.product_id" @chanage="errors.product_id.show = false">
+                <select class="form-select" x-model="form.product_id" @chanage="errors.product_id.show = false" disabled>
                     <option value="" disabled>Select Product</option>
                     <template x-for="(item,i) in products?.data" :key="i">
-                        <option :selected="item?.id === form.product_id ? 'selected' : ''" :value="item?.id"
+                        <option :selected="item?.unique_id == form.product_id ? 'selected' : ''" :value="item?.unique_id"
                             x-text="item?.name">
                         </option>
                     </template>

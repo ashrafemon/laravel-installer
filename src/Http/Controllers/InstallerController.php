@@ -61,7 +61,7 @@ class InstallerController extends Controller
         try {
             $client = \Illuminate\Support\Facades\Http::withHeaders([
                 'Accept' => 'application/json', 'Content-Type' => 'application/json',
-            ])->get(config('laravel-installer.products_url') . '?page=1&offset=20');
+            ])->get(config('laravel-installer.products_url') . '?page=1&offset=100');
             $client = $client->json();
 
             if ($client['status'] === 'success') {
