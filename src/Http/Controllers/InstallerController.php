@@ -157,15 +157,22 @@ class InstallerController extends Controller
                 return $this->installerValidateError($validator->errors());
             }
 
-            $model = config('auth.providers.users.model');
-            $model::create([
+            $model   = config('auth.providers.users.model');
+            $payload = [
                 config('laravel-installer.role_property') => config('laravel-installer.role_id'),
                 config('laravel-installer.name_property') => request()->input('first_name'),
                 'last_name'                               => request()->input('last_name'),
                 'phone'                                   => request()->input('phone'),
                 'email'                                   => request()->input('email'),
                 'password'                                => request()->input('password'),
-            ]);
+            ];
+
+            if (config('extra_properties')) {
+                $properties = explode(',', config('extra_properties'));
+                $payload    = array_merge($payload, $properties);
+            }
+
+            $model::create($payload);
 
             $content = <<<TEXT
             <?php
