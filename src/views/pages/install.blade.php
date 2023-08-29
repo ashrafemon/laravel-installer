@@ -10,7 +10,7 @@
                         <div class="col">
                             <label class="form-label">Name</label>
                             <input type="text" class="form-control"
-                                x-model="form.{{ config('laravel-installer.name_property') }} }}"
+                                x-model="form.{{ config('laravel-installer.name_property') }}"
                                 @keyup="errors.{{ config('laravel-installer.name_property') }}.show = false">
 
                             <template x-if="errors.{{ config('laravel-installer.name_property') }}.show">

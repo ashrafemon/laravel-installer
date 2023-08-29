@@ -3,10 +3,10 @@
 return [
     'extensions'  => [
         ['title' => 'PHP >= 8.0', 'value' => phpversion() >= 8.0, 'text' => phpversion()],
-        ['title' => 'MySqli PHP Extension', 'value' => extension_loaded('bcmath'), 'text' => extension_loaded('bcmath') ? 'Enable' : 'Disable'],
+        ['title' => 'MySqli PHP Extension', 'value' => extension_loaded('mysqli'), 'text' => extension_loaded('mysqli') ? 'Enable' : 'Disable'],
         ['title' => 'PDO PHP Extension', 'value' => extension_loaded('pdo'), 'text' => extension_loaded('pdo') ? 'Enable' : 'Disable'],
-        ['title' => 'BCMath PHP Extension', 'value' => extension_loaded('bcMath'), 'text' => extension_loaded('bcMath') ? 'Enable' : 'Disable'],
-        ['title' => 'Ctype PHP Extension', 'value' => extension_loaded('cType'), 'text' => extension_loaded('cType') ? 'Enable' : 'Disable'],
+        // ['title' => 'BCMath PHP Extension', 'value' => extension_loaded('bcMath'), 'text' => extension_loaded('bcMath') ? 'Enable' : 'Disable'],
+        // ['title' => 'Ctype PHP Extension', 'value' => extension_loaded('cType'), 'text' => extension_loaded('cType') ? 'Enable' : 'Disable'],
         ['title' => 'FileInfo PHP Extension', 'value' => extension_loaded('fileInfo'), 'text' => extension_loaded('fileInfo') ? 'Enable' : 'Disable'],
         ['title' => 'JSON PHP Extension', 'value' => extension_loaded('json'), 'text' => extension_loaded('json') ? 'Enable' : 'Disable'],
         ['title' => 'Mbstring PHP Extension', 'value' => extension_loaded('mbString'), 'text' => extension_loaded('mbString') ? 'Enable' : 'Disable'],
