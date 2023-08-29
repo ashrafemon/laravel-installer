@@ -11,39 +11,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>uploads/images</td>
-                        <td class="text-center">
-                            <span class="badge rounded-pill p-2"
-                                :class="permissions.images ? 'text-bg-primary' : 'text-bg-danger'"
-                                x-text="permissions.images ? 'Enabled': 'Disabled'">
-                                N/A
-                            </span>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>uploads/videos</td>
-                        <td class="text-center">
-                            <span class="badge rounded-pill p-2"
-                                :class="permissions.videos ? 'text-bg-primary' : 'text-bg-danger'"
-                                x-text="permissions.videos ? 'Enabled': 'Disabled'">
-                                N/A
-                            </span>
-
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td>uploads/files</td>
-                        <td class="text-center">
-                            <span class="badge rounded-pill p-2"
-                                :class="permissions.files ? 'text-bg-primary' : 'text-bg-danger'"
-                                x-text="permissions.files ? 'Enabled': 'Disabled'">
-                                N/A
-                            </span>
-                        </td>
-                    </tr>
+                    <template x-for="(item,i) in permissions">
+                        <tr :key="i">
+                            <td x-text="item.title"></td>
+                            <td class="text-center">
+                                <span class="badge rounded-pill p-2"
+                                    :class="item.value ? 'text-bg-primary' : 'text-bg-danger'"
+                                    x-text="item.value ? 'Enabled': 'Disabled'">
+                                    N/A
+                                </span>
+                            </td>
+                        </tr>
+                    </template>
                 </tbody>
             </table>
 
@@ -58,7 +37,7 @@
     <script>
         document.addEventListener("alpine:init", () => {
             Alpine.data("permissions", () => ({
-                permissions: {},
+                permissions: [],
                 async init() {
                     await fetch('/api/v1/permissions', {
                             method: "GET",
@@ -90,7 +69,7 @@
                             })
                             if (res.status === 'success') {
                                 setTimeout(() => {
-                                    window.location.href = '/installer/license'
+                                    window.location.href = res?.data?.url
                                 }, 1000);
                             }
                         })

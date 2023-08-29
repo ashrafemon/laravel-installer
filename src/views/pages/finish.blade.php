@@ -29,7 +29,7 @@
     <script>
         document.addEventListener("alpine:init", () => {
             Alpine.data("finish", () => ({
-                loginUrl: window.origin + '/login'
+                loginUrl: window.origin + "{{ config('laravel-installer.login_url') }}"
             }))
         })
     </script>

@@ -43,33 +43,12 @@ trait ApiHelper
 
     private function getRequireExtensions()
     {
-        return [
-            'php'           => phpversion(),
-            'phpVersion'    => phpversion() >= 8.0,
-            'bcMath'        => extension_loaded('bcmath'),
-            'cType'         => extension_loaded('ctype'),
-            'fileInfo'      => extension_loaded('fileinfo'),
-            'json'          => extension_loaded('json'),
-            'mbString'      => extension_loaded('mbstring'),
-            'openSSL'       => extension_loaded('openssl'),
-            'pdo'           => extension_loaded('pdo'),
-            'tokenizer'     => extension_loaded('tokenizer'),
-            'xml'           => extension_loaded('xml'),
-            'mysqli'        => extension_loaded('mysqli'),
-            'gd'            => extension_loaded('gd'),
-            'zip'           => extension_loaded('zip'),
-            'allowUrlFOpen' => ini_get('allow_url_fopen'),
-            'curl'          => extension_loaded("curl"),
-        ];
+        return config('laravel-constants.extensions');
     }
 
     private function getRequirePermissions()
     {
-        return [
-            'files'  => is_writable(public_path() . '/uploads/files'),
-            'images' => is_writable(public_path() . '/uploads/images'),
-            'videos' => is_writable(public_path() . '/uploads/videos'),
-        ];
+        return config('laravel-constants.permissions');
     }
 
     private function getDatabaseConnection()

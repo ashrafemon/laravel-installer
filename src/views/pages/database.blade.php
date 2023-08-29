@@ -147,7 +147,7 @@
 
                                 if (res.status === 'success') {
                                     setTimeout(() => {
-                                        window.location.href = '/installer/install'
+                                        window.location.href = res?.data?.url
                                     }, 1000);
                                 }
                             }

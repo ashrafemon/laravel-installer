@@ -8,15 +8,17 @@
                     <h6 class="fs-5 fw-bold py-2">Admin Login</h6>
                     <div class="row row-cols-1 gx-3 gy-4">
                         <div class="col">
-                            <label class="form-label">First Name</label>
-                            <input type="text" class="form-control" x-model="form.first_name"
-                                @keyup="errors.first_name.show = false">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control"
+                                x-model="form.'{{ config('laravel-installer.name_property') }}'}}"
+                                @keyup="errors.'{{ config('laravel-installer.name_property') }}'.show = false">
 
-                            <template x-if="errors.first_name.show">
-                                <p x-text="errors.first_name.text" class="text-danger"></p>
+                            <template x-if="errors.'{{ config('laravel-installer.name_property') }}'.show">
+                                <p x-text="errors.'{{ config('laravel-installer.name_property') }}'.text"
+                                    class="text-danger"></p>
                             </template>
                         </div>
-                        <div class="col">
+                        {{-- <div class="col">
                             <label class="form-label">Last Name</label>
                             <input type="text" class="form-control" x-model="form.last_name"
                                 @keyup="errors.last_name.show = false">
@@ -24,7 +26,7 @@
                             <template x-if="errors.last_name.show">
                                 <p x-text="errors.last_name.text" class="text-danger"></p>
                             </template>
-                        </div>
+                        </div> --}}
                         <div class="col">
                             <label class="form-label">Email</label>
                             <input type="email" class="form-control" x-model="form.email"
@@ -69,20 +71,20 @@
         document.addEventListener("alpine:init", () => {
             Alpine.data("installs", () => ({
                 form: {
-                    first_name: '',
-                    last_name: '',
+                    "{{ config('laravel-installer.name_property') }}": '',
+                    // last_name: '',
                     email: '',
                     password: '',
                 },
                 errors: {
-                    first_name: {
+                    "{{ config('laravel-installer.name_property') }}": {
                         text: '',
                         show: false
                     },
-                    last_name: {
-                        text: '',
-                        show: false
-                    },
+                    // last_name: {
+                    //     text: '',
+                    //     show: false
+                    // },
                     email: {
                         text: '',
                         show: false
@@ -128,7 +130,7 @@
 
                                 if (res.status === 'success') {
                                     setTimeout(() => {
-                                        window.location.href = '/installer/finish'
+                                        window.location.href = res?.data?.url
                                     }, 1000);
                                 }
                             }

@@ -23,11 +23,11 @@ class InstallerController extends Controller
     {
         try {
             foreach ($this->getRequireExtensions() as $item) {
-                if (!$item) {
+                if (!$item['value']) {
                     return $this->installerMessageResponse('Please enabled the required extensions', 400);
                 }
             }
-            return $this->installerMessageResponse('Requirement step is completed', 200, 'success');
+            return $this->installerEntityResponse(['url' => '/installer/permissions'], 200, 'success', 'Requirement step is completed');
         } catch (Exception $e) {
             return $this->installerServerError($e);
         }
@@ -46,11 +46,13 @@ class InstallerController extends Controller
     {
         try {
             foreach ($this->getRequirePermissions() as $item) {
-                if (!$item) {
+                if (!$item['value']) {
                     return $this->installerMessageResponse('Please enabled the required permissions', 400);
                 }
             }
-            return $this->installerMessageResponse('Permissions step is completed', 200, 'success');
+
+            $url = config('laravel-installer.license_check') ? '/installer/license' : '/installer/database';
+            return $this->installerEntityResponse(['url' => $url], 200, 'success', 'Permissions step is completed');
         } catch (Exception $e) {
             return $this->installerServerError($e);
         }
@@ -59,14 +61,19 @@ class InstallerController extends Controller
     public function getProducts()
     {
         try {
-            $client = \Illuminate\Support\Facades\Http::withHeaders([
-                'Accept' => 'application/json', 'Content-Type' => 'application/json',
-            ])->get(config('laravel-installer.products_url') . '?page=1&offset=100');
-            $client = $client->json();
+            $products = config('laravel-constants.products');
 
-            if ($client['status'] === 'success') {
-                $products = $client['data'];
+            if (config('laravel-installer.product_fetch')) {
+                $client = \Illuminate\Support\Facades\Http::withHeaders([
+                    'Accept' => 'application/json', 'Content-Type' => 'application/json',
+                ])->get(config('laravel-installer.products_url') . '?page=1&offset=100');
+                $client = $client->json();
+
+                if ($client['status'] === 'success') {
+                    $products = $client['data'];
+                }
             }
+
             return $this->installerEntityResponse([
                 'products'            => $products ?? [],
                 'selected_product_id' => config('laravel-installer.product_id'),
@@ -79,22 +86,24 @@ class InstallerController extends Controller
     public function validateLicenses()
     {
         try {
-            $validator = \Illuminate\Support\Facades\Validator::make(request()->all(), [
-                'product_id' => 'required',
-                'code'       => 'required|regex:/^([a-f0-9]{8})-(([a-f0-9]{4})-){3}([a-f0-9]{12})$/i',
-            ]);
-            if ($validator->fails()) {
-                return $this->installerValidateError($validator->errors());
-            }
+            if (config('laravel-installer.license_check')) {
+                $validator = \Illuminate\Support\Facades\Validator::make(request()->all(), [
+                    'product_id' => 'required',
+                    'code'       => 'required|regex:/^([a-f0-9]{8})-(([a-f0-9]{4})-){3}([a-f0-9]{12})$/i',
+                ]);
+                if ($validator->fails()) {
+                    return $this->installerValidateError($validator->errors());
+                }
 
-            $client = \Illuminate\Support\Facades\Http::withHeaders([
-                'Accept' => 'application/json', 'Content-Type' => 'application/json',
-            ])->post(config('laravel-installer.license_url'), [
-                'product_id' => request()->input('product_id'),
-                'code'       => request()->input('code'),
-            ]);
-            $client = $client->json();
-            return $client;
+                $client = \Illuminate\Support\Facades\Http::withHeaders([
+                    'Accept' => 'application/json', 'Content-Type' => 'application/json',
+                ])->post(config('laravel-installer.license_url'), [
+                    'product_id' => request()->input('product_id'),
+                    'code'       => request()->input('code'),
+                ]);
+                $client = $client->json();
+                return $client;
+            }
         } catch (Exception $e) {
             return $this->installerServerError($e);
         }
@@ -127,7 +136,7 @@ class InstallerController extends Controller
                 return $this->installerMessageResponse('Please use the correct database credentials', 400);
             }
 
-            return $this->installerMessageResponse('Database step is completed', 200, 'success');
+            return $this->installerEntityResponse(['url' => '/installer/install'], 200, 'success', 'Database step is completed');
         } catch (Exception $e) {
             return $this->installerServerError($e);
         }
@@ -137,13 +146,12 @@ class InstallerController extends Controller
     {
         try {
             $validator = \Illuminate\Support\Facades\Validator::make(request()->all(), [
-                'role_id'    => 'sometimes',
-                'first_name' => 'required',
-                'last_name'  => 'sometimes',
-                'phone'      => 'sometimes',
-                'email'      => 'required',
-                'password'   => 'required',
-
+                config('laravel-installer.role_property') => 'sometimes',
+                config('laravel-installer.name_property') => 'required',
+                'last_name'                               => 'sometimes',
+                'phone'                                   => 'sometimes',
+                'email'                                   => 'required',
+                'password'                                => 'required',
             ]);
             if ($validator->fails()) {
                 return $this->installerValidateError($validator->errors());
@@ -151,12 +159,12 @@ class InstallerController extends Controller
 
             $model = config('auth.providers.users.model');
             $model::create([
-                'role_id'    => 1,
-                'first_name' => request()->input('first_name'),
-                'last_name'  => request()->input('last_name'),
-                'phone'      => request()->input('phone'),
-                'email'      => request()->input('email'),
-                'password'   => request()->input('password'),
+                config('laravel-installer.role_property') => config('laravel-installer.role_id'),
+                config('laravel-installer.name_property') => request()->input('first_name'),
+                'last_name'                               => request()->input('last_name'),
+                'phone'                                   => request()->input('phone'),
+                'email'                                   => request()->input('email'),
+                'password'                                => request()->input('password'),
             ]);
 
             $content = <<<TEXT
@@ -168,7 +176,7 @@ class InstallerController extends Controller
             file_put_contents(config_path() . '/installed.php', $content);
             file_put_contents(storage_path() . '/installed', 'Installed');
 
-            return $this->installerMessageResponse('Installation step is completed', 200, 'success');
+            return $this->installerEntityResponse(['url' => '/installer/finish'], 200, 'success', 'Installation step is completed');
         } catch (Exception $e) {
             return $this->installerServerError($e);
         }
