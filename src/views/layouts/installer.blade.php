@@ -109,7 +109,9 @@
                     <li class="{{ Route::current()->getName() === 'permissions.index' ? 'active' : '' }}">
                         Permissions
                     </li>
-                    <li class="{{ Route::current()->getName() === 'license.index' ? 'active' : '' }}">License</li>
+                    @if (config('laravel-installer.license_check'))
+                        <li class="{{ Route::current()->getName() === 'license.index' ? 'active' : '' }}">License</li>
+                    @endif
                     <li class="{{ Route::current()->getName() === 'database.index' ? 'active' : '' }}">Database</li>
                     {{-- <li class="{{ Route::current()->getName() === 'requirements.index' ? 'active' : '' }}">Mail</li> --}}
                     <li class="{{ Route::current()->getName() === 'install.index' ? 'active' : '' }}">Install</li>

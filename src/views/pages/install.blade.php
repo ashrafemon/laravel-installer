@@ -10,12 +10,12 @@
                         <div class="col">
                             <label class="form-label">Name</label>
                             <input type="text" class="form-control"
-                                x-model="form.'{{ config('laravel-installer.name_property') }}'}}"
-                                @keyup="errors.'{{ config('laravel-installer.name_property') }}'.show = false">
+                                x-model="form.{{ config('laravel-installer.name_property') }} }}"
+                                @keyup="errors.{{ config('laravel-installer.name_property') }}.show = false">
 
-                            <template x-if="errors.'{{ config('laravel-installer.name_property') }}'.show">
-                                <p x-text="errors.'{{ config('laravel-installer.name_property') }}'.text"
-                                    class="text-danger"></p>
+                            <template x-if="errors.{{ config('laravel-installer.name_property') }}.show">
+                                <p x-text="errors.{{ config('laravel-installer.name_property') }}.text" class="text-danger">
+                                </p>
                             </template>
                         </div>
                         {{-- <div class="col">
@@ -71,20 +71,15 @@
         document.addEventListener("alpine:init", () => {
             Alpine.data("installs", () => ({
                 form: {
-                    "{{ config('laravel-installer.name_property') }}": '',
-                    // last_name: '',
+                    {{ config('laravel-installer.name_property') }}: '',
                     email: '',
                     password: '',
                 },
                 errors: {
-                    "{{ config('laravel-installer.name_property') }}": {
+                    {{ config('laravel-installer.name_property') }}: {
                         text: '',
                         show: false
                     },
-                    // last_name: {
-                    //     text: '',
-                    //     show: false
-                    // },
                     email: {
                         text: '',
                         show: false

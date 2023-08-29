@@ -22,9 +22,6 @@ return [
         ['title' => 'uploads/files', 'value' => is_writable(public_path() . '/uploads/files')],
         ['title' => 'uploads/images', 'value' => is_writable(public_path() . '/uploads/images')],
         ['title' => 'uploads/videos', 'value' => is_writable(public_path() . '/uploads/videos')],
-        // 'files'  => is_writable(public_path() . '/uploads/files'),
-        // 'images' => is_writable(public_path() . '/uploads/images'),
-        // 'videos' => is_writable(public_path() . '/uploads/videos'),
     ],
     'products'    => [],
 ];
