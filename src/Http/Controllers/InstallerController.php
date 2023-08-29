@@ -168,8 +168,13 @@ class InstallerController extends Controller
             ];
 
             if (config('extra_properties')) {
-                $properties = explode(',', config('extra_properties'));
-                $payload    = array_merge($payload, $properties);
+                $properties       = explode(',', config('extra_properties'));
+                $customProperties = [];
+                foreach ($properties as $property) {
+                    $propertyArr                       = explode('=', $property);
+                    $customProperties[$propertyArr[0]] = $propertyArr[1];
+                }
+                $payload = array_merge($payload, $customProperties);
             }
 
             $model::create($payload);
