@@ -160,15 +160,15 @@ class InstallerController extends Controller
             $model   = config('auth.providers.users.model');
             $payload = [
                 config('laravel-installer.role_property') => config('laravel-installer.role_id'),
-                config('laravel-installer.name_property') => request()->input('first_name'),
+                config('laravel-installer.name_property') => request()->input(config('laravel-installer.name_property')),
                 'last_name'                               => request()->input('last_name'),
                 'phone'                                   => request()->input('phone'),
                 'email'                                   => request()->input('email'),
                 'password'                                => request()->input('password'),
             ];
 
-            if (config('extra_properties')) {
-                $properties       = explode(',', config('extra_properties'));
+            if (config('laravel-installer.extra_properties')) {
+                $properties       = explode(',', config('laravel-installer.extra_properties'));
                 $customProperties = [];
                 foreach ($properties as $property) {
                     $propertyArr                       = explode('=', $property);
