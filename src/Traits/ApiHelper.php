@@ -72,16 +72,17 @@ trait ApiHelper
                 return false;
             }
 
+            Artisan::call('optimize:clear');
+            Artisan::call('migrate:fresh --seed');
+
             $this->setEnvironmentProperty([
-                // 'APP_URL'     => url(''),
+                'APP_URL'     => request()->getSchemeAndHttpHost(),
                 'DB_HOST'     => request()->input('DB_HOST'),
                 'DB_PORT'     => request()->input('DB_PORT'),
                 'DB_DATABASE' => request()->input('DB_DATABASE'),
                 'DB_USERNAME' => request()->input('DB_USERNAME'),
                 'DB_PASSWORD' => request()->input('DB_PASSWORD'),
             ]);
-
-            Artisan::call('migrate:fresh --seed');
             return true;
         } catch (Exception $e) {
             return false;
@@ -93,7 +94,7 @@ trait ApiHelper
         if ($type === 'app') {
             return [
                 'APP_NAME'  => env('APP_NAME'),
-                'APP_URL'   => url('') ?? env('APP_URL'),
+                'APP_URL'   => request()->getSchemeAndHttpHost() ?? env('APP_URL'),
                 'APP_DEBUG' => env('APP_DEBUG'),
                 'APP_ENV'   => env('APP_ENV'),
             ];
@@ -142,7 +143,6 @@ trait ApiHelper
         if (!file_put_contents($envFile, $str)) {
             return false;
         }
-
         return true;
     }
 }
