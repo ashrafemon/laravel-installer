@@ -39,7 +39,7 @@
             Alpine.data("permissions", () => ({
                 permissions: [],
                 async init() {
-                    await fetch('/api/v1/permissions', {
+                    await fetch('/api/v1/dir-permissions', {
                             method: "GET",
                             headers: {
                                 Accept: 'application/json'
@@ -54,7 +54,7 @@
                         .catch(err => console.log(err))
                 },
                 async submitHandler() {
-                    await fetch('/api/v1/permissions/validate', {
+                    await fetch('/api/v1/dir-permissions/validate', {
                             method: "POST",
                             headers: {
                                 Accept: 'application/json',

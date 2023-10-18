@@ -19,7 +19,7 @@ Route::prefix('api/v1')->middleware('api')->group(function () {
         Route::post('validate', [\Leafwrap\LaravelInstaller\Http\Controllers\InstallerController::class, 'validateExtensions']);
     });
 
-    Route::prefix('permissions')->group(function () {
+    Route::prefix('dir-permissions')->group(function () {
         Route::get('', [\Leafwrap\LaravelInstaller\Http\Controllers\InstallerController::class, 'getPermissions']);
         Route::post('validate', [\Leafwrap\LaravelInstaller\Http\Controllers\InstallerController::class, 'validatePermissions']);
     });
