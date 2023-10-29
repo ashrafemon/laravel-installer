@@ -73,10 +73,17 @@ trait ApiHelper
             }
 
             Artisan::call('optimize:clear');
-            Artisan::call('migrate:fresh --seed');
+
+            $model = config('auth.providers.users.model');
+            if (!$model::query()->first()) {
+                Artisan::call('migrate:fresh --seed');
+            } else {
+                Artisan::call('migrate');
+            }
 
             $this->setEnvironmentProperty([
                 'APP_URL'     => request()->getSchemeAndHttpHost(),
+                'APP_DEBUG'   => false,
                 'DB_HOST'     => request()->input('DB_HOST'),
                 'DB_PORT'     => request()->input('DB_PORT'),
                 'DB_DATABASE' => request()->input('DB_DATABASE'),
