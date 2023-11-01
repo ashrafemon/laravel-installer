@@ -5,6 +5,7 @@ namespace Leafwrap\LaravelInstaller\Traits;
 use Exception;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 trait ApiHelper
 {
@@ -54,28 +55,26 @@ trait ApiHelper
     private function getDatabaseConnection()
     {
         try {
-            $driver = env('DB_CONNECTION');
+            $driver = config('database.default');
             if (!in_array($driver, ['mysql', 'pgsql', 'sqlsrv'])) {
                 return false;
             }
 
-            config('database.connections', [
-                $driver => [
-                    'host'     => request()->input('DB_HOST'),
-                    'port'     => request()->input('DB_PORT'),
-                    'database' => request()->input('DB_DATABASE'),
-                    'username' => request()->input('DB_USERNAME'),
-                    'password' => request()->input('DB_PASSWORD'),
-                ],
+            $payload = array_merge(config('database.connections.' . $driver), [
+                'host'     => request()->input('DB_HOST'),
+                'port'     => request()->input('DB_PORT'),
+                'database' => request()->input('DB_DATABASE'),
+                'username' => request()->input('DB_USERNAME'),
+                'password' => request()->input('DB_PASSWORD'),
             ]);
-            if (!DB::connection()->getPDO()) {
+            config('database.connections.' . $driver, $payload);
+
+            if (!DB::connection($driver)->getPDO()) {
                 return false;
             }
 
             Artisan::call('optimize:clear');
-
-            $model = config('auth.providers.users.model');
-            if (!$model::query()->first()) {
+            if (!Schema::hasTable('users')) {
                 Artisan::call('migrate:fresh --seed');
             } else {
                 Artisan::call('migrate');
@@ -83,7 +82,7 @@ trait ApiHelper
 
             $this->setEnvironmentProperty([
                 'APP_URL'     => request()->getSchemeAndHttpHost(),
-                'APP_DEBUG'   => false,
+                // 'APP_DEBUG'   => false,
                 'DB_HOST'     => request()->input('DB_HOST'),
                 'DB_PORT'     => request()->input('DB_PORT'),
                 'DB_DATABASE' => request()->input('DB_DATABASE'),
